@@ -5,15 +5,21 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+// For production, restrict CORS to your frontend domain
+const allowedOrigins = [
+  'https://vok-chat.vercel.app',
+  'http://localhost:5173' // Uncomment for local development if needed
+];
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // Update this in production
+    origin: allowedOrigins,
     methods: ['GET', 'POST']
   }
 });
 
-app.use(cors());
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
