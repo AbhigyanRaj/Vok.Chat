@@ -16,7 +16,13 @@ const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
     methods: ['GET', 'POST']
-  }
+  },
+  // Optimize for low latency
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  transports: ['websocket'],
+  allowEIO3: true,
+  maxHttpBufferSize: 1e6, // 1MB
 });
 
 app.use(cors({ origin: allowedOrigins }));
