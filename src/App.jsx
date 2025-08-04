@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { FiMic, FiMicOff, FiVideo, FiVideoOff, FiPhoneOff, FiCopy, FiCheck } from 'react-icons/fi';
+import { FiMic, FiMicOff, FiVideo, FiVideoOff, FiPhoneOff, FiCopy, FiCheck, FiRotateCw } from 'react-icons/fi';
 
 const SOCKET_URL = import.meta.env.VITE_BACKEND_URL || 
   (import.meta.env.PROD ? 'https://vok-chat.onrender.com' : 'ws://localhost:5001');
@@ -30,6 +30,9 @@ function App() {
   const [peerMuted, setPeerMuted] = useState(false);
   const videoSenderRef = useRef(null);
   const [copied, setCopied] = useState(false);
+  const [cameraFacing, setCameraFacing] = useState('user'); // 'user' or 'environment'
+  const [showLeaveMessage, setShowLeaveMessage] = useState('');
+  const [leaveMessageTimeout, setLeaveMessageTimeout] = useState(null);
 
   // ICE servers for STUN (public Google STUN)
   const iceServers = {
@@ -105,14 +108,29 @@ function App() {
         }
       });
 
-      socketRef.current.on('user-left', () => {
-        console.log('[SIGNAL] user-left');
+      socketRef.current.on('user-left', (data) => {
+        console.log('[SIGNAL] user-left', data);
         setPeerConnected(false);
         if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
         if (peerConnectionRef.current) {
           peerConnectionRef.current.close();
           peerConnectionRef.current = null;
         }
+        
+        // Show leave message
+        const message = data?.message || 'Peer left the room';
+        setShowLeaveMessage(message);
+        
+        // Clear previous timeout
+        if (leaveMessageTimeout) {
+          clearTimeout(leaveMessageTimeout);
+        }
+        
+        // Hide message after 3 seconds
+        const timeout = setTimeout(() => {
+          setShowLeaveMessage('');
+        }, 3000);
+        setLeaveMessageTimeout(timeout);
       });
 
       return () => {
@@ -268,6 +286,95 @@ function App() {
       }
     }
   }, [videoPaused]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (leaveMessageTimeout) {
+        clearTimeout(leaveMessageTimeout);
+      }
+    };
+  }, [leaveMessageTimeout]);
+
+  // Camera rotation function
+  async function rotateCamera() {
+    if (!localStreamRef.current) return;
+    
+    try {
+      // Stop current video track
+      const currentVideoTrack = localStreamRef.current.getVideoTracks()[0];
+      if (currentVideoTrack) {
+        currentVideoTrack.stop();
+      }
+      
+      // Switch camera facing mode
+      const newFacingMode = cameraFacing === 'user' ? 'environment' : 'user';
+      setCameraFacing(newFacingMode);
+      
+      // Get new video stream with different camera
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: { 
+          facingMode: newFacingMode,
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: true
+      });
+      
+      // Replace video track in local stream
+      const newVideoTrack = newStream.getVideoTracks()[0];
+      const oldVideoTrack = localStreamRef.current.getVideoTracks()[0];
+      
+      if (oldVideoTrack) {
+        localStreamRef.current.removeTrack(oldVideoTrack);
+      }
+      localStreamRef.current.addTrack(newVideoTrack);
+      
+      // Update local video element
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = localStreamRef.current;
+      }
+      
+      // Update peer connection if connected
+      if (peerConnectionRef.current && videoSenderRef.current) {
+        videoSenderRef.current.replaceTrack(newVideoTrack);
+      }
+      
+      // Stop the temporary stream
+      newStream.getTracks().forEach(track => {
+        if (track !== newVideoTrack) track.stop();
+      });
+      
+      console.log(`Camera rotated to ${newFacingMode} mode`);
+    } catch (error) {
+      console.error('Error rotating camera:', error);
+      // Fallback: try to get any available camera
+      try {
+        const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const newVideoTrack = fallbackStream.getVideoTracks()[0];
+        const oldVideoTrack = localStreamRef.current.getVideoTracks()[0];
+        
+        if (oldVideoTrack) {
+          localStreamRef.current.removeTrack(oldVideoTrack);
+        }
+        localStreamRef.current.addTrack(newVideoTrack);
+        
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = localStreamRef.current;
+        }
+        
+        if (peerConnectionRef.current && videoSenderRef.current) {
+          videoSenderRef.current.replaceTrack(newVideoTrack);
+        }
+        
+        fallbackStream.getTracks().forEach(track => {
+          if (track !== newVideoTrack) track.stop();
+        });
+      } catch (fallbackError) {
+        console.error('Fallback camera rotation failed:', fallbackError);
+      }
+    }
+  }
 
   function handleEndCall() {
     setInSession(false);
@@ -430,8 +537,15 @@ function App() {
           ))}
         </div>
       </div>
+      {/* Leave message notification */}
+      {showLeaveMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-black/80 text-white px-6 py-3 rounded-lg border border-white/20 shadow-lg">
+          <span className="text-sm font-medium">{showLeaveMessage}</span>
+        </div>
+      )}
+
       {/* Simple control bar */}
-      <div className="w-full flex justify-center items-center gap-8 py-8 bg-black border-t border-white/10">
+      <div className="w-full flex justify-center items-center gap-6 py-8 bg-black border-t border-white/10">
         <button
           className="flex items-center justify-center w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
           onClick={() => setIsMuted(m => !m)}
@@ -445,6 +559,13 @@ function App() {
           title={videoPaused ? 'Resume video' : 'Pause video'}
         >
           {videoPaused ? <FiVideoOff size={32} /> : <FiVideo size={32} />}
+        </button>
+        <button
+          className="flex items-center justify-center w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+          onClick={rotateCamera}
+          title="Rotate camera"
+        >
+          <FiRotateCw size={32} />
         </button>
         <button
           className="flex items-center justify-center w-16 h-16 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"

@@ -85,10 +85,16 @@ io.on('connection', (socket) => {
   // Handle disconnect
   socket.on('disconnect', () => {
     for (const roomId in rooms) {
-      rooms[roomId] = rooms[roomId].filter(id => id !== socket.id);
-      // Notify others in the room
-      socket.to(roomId).emit('user-left', socket.id);
-      if (rooms[roomId].length === 0) delete rooms[roomId];
+      const wasInRoom = rooms[roomId].includes(socket.id);
+      if (wasInRoom) {
+        rooms[roomId] = rooms[roomId].filter(id => id !== socket.id);
+        // Notify others in the room with user info
+        socket.to(roomId).emit('user-left', { 
+          userId: socket.id,
+          message: 'Peer left the room'
+        });
+        if (rooms[roomId].length === 0) delete rooms[roomId];
+      }
     }
     console.log('User disconnected:', socket.id);
   });
