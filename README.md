@@ -295,7 +295,7 @@ npm run build
 # Deploy dist/ folder
 ```
 
-### Backend (Railway/Render)
+### Backend (Render)
 ```bash
 # Set environment variables
 PORT=5001
