@@ -1,31 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import LandingPage from './LandingPage';
 import VideoCall from './VideoCall';
 
 function App() {
-  const [sessionCode, setSessionCode] = useState('');
-  const [inCall, setInCall] = useState(false);
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/:sessionId" element={<VideoCallWrapper />} />
+      </Routes>
+    </Router>
+  );
+}
 
-  const handleStartCall = (code) => {
-    setSessionCode(code);
-    setInCall(true);
-  };
-
-  const handleJoinCall = (code) => {
-    setSessionCode(code);
-    setInCall(true);
-  };
+function VideoCallWrapper() {
+  const { sessionId } = useParams();
+  const navigate = useNavigate();
+  const [sessionCode, setSessionCode] = useState(sessionId);
+  const [inCall, setInCall] = useState(true);
 
   const handleEndCall = () => {
     setSessionCode('');
     setInCall(false);
+    navigate('/');
   };
 
-  if (inCall) {
-    return <VideoCall sessionCode={sessionCode} onEndCall={handleEndCall} />;
-  }
-
-  return <LandingPage onStartCall={handleStartCall} onJoinCall={handleJoinCall} />;
+  return <VideoCall sessionCode={sessionCode} onEndCall={handleEndCall} />;
 }
 
 export default App;

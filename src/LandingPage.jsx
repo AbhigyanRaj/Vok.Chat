@@ -1,20 +1,22 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function generateSessionCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
-function LandingPage({ onStartCall, onJoinCall }) {
+function LandingPage() {
   const [inputCode, setInputCode] = useState('');
+  const navigate = useNavigate();
 
   const handleStartCall = () => {
     const code = generateSessionCode();
-    onStartCall(code);
+    navigate(`/${code}`);
   };
 
   const handleJoinCall = () => {
     if (inputCode.trim()) {
-      onJoinCall(inputCode.trim().toUpperCase());
+      navigate(`/${inputCode.trim().toUpperCase()}`);
     }
   };
 
@@ -54,6 +56,9 @@ function LandingPage({ onStartCall, onJoinCall }) {
         <span>Confidential</span>
         <span>Supportive</span>
         <span>Empowering</span>
+      </div>
+      <div className="text-xs opacity-30 text-center mb-4">
+        Made by Abhigyan • IIIT Delhi
       </div>
     </div>
   );

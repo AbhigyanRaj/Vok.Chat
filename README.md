@@ -53,30 +53,33 @@ graph TB
         A[React App] --> B[WebRTC Client]
         B --> C[Socket.IO Client]
         A --> D[UI Components]
+        A --> E[React Router]
     end
     
     subgraph "Backend (Node.js + Express)"
-        E[Express Server] --> F[Socket.IO Server]
-        F --> G[Room Management]
-        G --> H[Signaling Service]
+        F[Express Server] --> G[Socket.IO Server]
+        G --> H[Room Management]
+        H --> I[Signaling Service]
     end
     
     subgraph "Peer-to-Peer Connection"
-        I[User A] -->|WebRTC| J[User B]
-        I -->|STUN/TURN| K[ICE Servers]
-        J -->|STUN/TURN| K
+        J[User A] -->|WebRTC| K[User B]
+        J -->|STUN/TURN| L[ICE Servers]
+        K -->|STUN/TURN| L
     end
     
-    C --> F
-    F --> C
-    B --> I
+    C --> G
+    G --> C
     B --> J
+    B --> K
+    E --> A
 ```
 
 ### Technology Stack
 
 #### Frontend
 - **React 19.1.0** - Modern UI framework with hooks
+- **React Router 6.8.0** - Client-side routing for URL-based navigation
 - **Vite 7.0.4** - Lightning-fast build tool
 - **Tailwind CSS 4.1.11** - Utility-first CSS framework
 - **Socket.IO Client 4.8.1** - Real-time communication
@@ -92,6 +95,37 @@ graph TB
 - **WebRTC** - Peer-to-peer video/audio streaming
 - **STUN/TURN Servers** - NAT traversal and relay
 - **ICE Protocol** - Connection establishment
+
+---
+
+## 🚀 Features
+
+### Core Functionality
+- ✅ **One-to-One Video Calls** - High-quality peer-to-peer video
+- ✅ **Audio Support** - Crystal clear voice communication
+- ✅ **Smart URL Sharing** - Shareable links like `vok-chat.app/ABC123`
+- ✅ **Real-time Controls** - Mute, pause video, end call
+- ✅ **Responsive Design** - Works on desktop and mobile
+- ✅ **Auto Quality Adaptation** - Automatic video quality adjustment based on connection
+
+### Smart URL Sharing
+- 🔗 **Direct Links** - `vok-chat.app/ABC123` for instant joining
+- 📋 **Copy Link** - One-click copy of shareable URL
+- 📤 **Native Sharing** - Share via WhatsApp, Email, SMS, etc.
+- 📱 **Mobile Optimized** - Perfect for mobile sharing
+
+### Mobile Features
+- 📱 **Camera Rotation** - Switch between front/back cameras
+- 👋 **User Leave Notifications** - Real-time notifications when peers leave
+- 🎯 **Touch-Optimized** - Designed for mobile interaction
+- 📱 **Responsive Layout** - Side-by-side video on desktop, stacked on mobile
+
+### Technical Features
+- 🌐 **WebRTC** - Standard web technology
+- 📡 **STUN Servers** - NAT traversal support
+- 🔒 **Encrypted Media** - SRTP/SRTCP protection
+- 🎯 **Low Latency** - Direct peer connections
+- 🔄 **Auto Quality Switching** - Maintains high audio quality even when video quality adapts
 
 ---
 
@@ -131,28 +165,6 @@ sequenceDiagram
 
 ---
 
-## 🚀 Features
-
-### Core Functionality
-- ✅ **One-to-One Video Calls** - High-quality peer-to-peer video
-- ✅ **Audio Support** - Crystal clear voice communication
-- ✅ **Session Management** - Unique 6-character session codes
-- ✅ **Real-time Controls** - Mute, pause video, end call
-- ✅ **Responsive Design** - Works on desktop and mobile
-
-### Mobile Features
-- 📱 **Camera Rotation** - Switch between front/back cameras
-- 👋 **User Leave Notifications** - Real-time notifications when peers leave
-- 🎯 **Touch-Optimized** - Designed for mobile interaction
-
-### Technical Features
-- 🌐 **WebRTC** - Standard web technology
-- 📡 **STUN Servers** - NAT traversal support
-- 🔒 **Encrypted Media** - SRTP/SRTCP protection
-- 🎯 **Low Latency** - Direct peer connections
-
----
-
 ## 📦 Installation & Setup
 
 ### Prerequisites
@@ -163,8 +175,8 @@ sequenceDiagram
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/vokchat.git
-cd vokchat
+git clone https://github.com/AbhigyanRaj/Vok.Chat.git
+cd Vok.Chat
 ```
 
 2. **Install frontend dependencies**
@@ -207,20 +219,29 @@ Navigate to `http://localhost:5173`
 
 ### Starting a Call
 1. Click **"Start a Call"** button
-2. Share the generated session code with your contact
-3. Wait for them to join
+2. System generates a unique URL (e.g., `vok-chat.app/ABC123`)
+3. Use **"Copy Link"** or **"Share"** buttons to share with others
+4. Wait for them to join via the link
 
 ### Joining a Call
-1. Enter the session code provided by the host
-2. Click **"Join Call"** button
+1. **Option A**: Click the shared link directly
+2. **Option B**: Enter the session code manually
 3. Grant camera/microphone permissions
+4. Automatically joins the room
 
 ### During the Call
 - 🎤 **Mute/Unmute** - Click microphone icon
 - 📹 **Pause/Resume Video** - Click video icon  
 - 🔄 **Rotate Camera** - Click rotate icon (mobile devices)
 - 📞 **End Call** - Click red phone icon
-- 📋 **Copy Session Code** - Click copy icon next to code
+- 📋 **Copy Link** - Click copy icon to share room URL
+- 📤 **Share** - Click share icon for native sharing
+
+### Smart URL Sharing
+- **Copy Link**: Copies full URL to clipboard
+- **Share Button**: Opens native share dialog (WhatsApp, Email, etc.)
+- **Direct Access**: Anyone with the link can join instantly
+- **No Typing Required**: Just click the link to join
 
 ---
 
@@ -229,8 +250,11 @@ Navigate to `http://localhost:5173`
 ```
 VokChat/
 ├── 📁 src/                    # Frontend source code
-│   ├── App.jsx               # Main application component
+│   ├── App.jsx               # Main application with routing
+│   ├── LandingPage.jsx       # Landing page component
+│   ├── VideoCall.jsx         # Video call component
 │   ├── main.jsx              # React entry point
+│   ├── turnConfig.js         # WebRTC configuration
 │   └── index.css             # Global styles & fonts
 ├── 📁 backend/               # Backend server
 │   ├── index.js              # Express + Socket.IO server
@@ -269,20 +293,24 @@ npm start        # Start production server
 #### Frontend Architecture
 ```mermaid
 graph LR
-    A[App.jsx] --> B[WebRTC Manager]
-    A --> C[Socket.IO Client]
-    A --> D[UI Components]
+    A[App.jsx] --> B[React Router]
+    A --> C[WebRTC Manager]
+    A --> D[Socket.IO Client]
+    A --> E[UI Components]
     
-    B --> E[Peer Connection]
-    B --> F[Media Streams]
-    B --> G[ICE Handling]
+    B --> F[LandingPage]
+    B --> G[VideoCall]
     
-    C --> H[Signaling]
-    C --> I[Room Management]
+    C --> H[Peer Connection]
+    C --> I[Media Streams]
+    C --> J[ICE Handling]
     
-    D --> J[Video Display]
-    D --> K[Controls]
-    D --> L[Session UI]
+    D --> K[Signaling]
+    D --> L[Room Management]
+    
+    E --> M[Video Display]
+    E --> N[Controls]
+    E --> O[Share UI]
 ```
 
 #### Backend Architecture
@@ -351,10 +379,10 @@ NODE_ENV=production
 
 <div align="center">
 
-**Made with ❤️ for secure, meaningful connections**
+**Made with ❤️ by Abhigyan • IIIT Delhi**
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/vokchat?style=social)](https://github.com/yourusername/vokchat)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/vokchat?style=social)](https://github.com/yourusername/vokchat)
-[![GitHub issues](https://img.shields.io/github/issues/yourusername/vokchat)](https://github.com/yourusername/vokchat/issues)
+[![GitHub stars](https://img.shields.io/github/stars/AbhigyanRaj/Vok.Chat?style=social)](https://github.com/AbhigyanRaj/Vok.Chat)
+[![GitHub forks](https://img.shields.io/github/forks/AbhigyanRaj/Vok.Chat?style=social)](https://github.com/AbhigyanRaj/Vok.Chat)
+[![GitHub issues](https://img.shields.io/github/issues/AbhigyanRaj/Vok.Chat)](https://github.com/AbhigyanRaj/Vok.Chat/issues)
 
 </div>

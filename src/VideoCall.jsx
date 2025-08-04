@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { FiMic, FiMicOff, FiVideo, FiVideoOff, FiPhoneOff, FiCopy, FiCheck, FiRotateCw } from 'react-icons/fi';
+import { FiMic, FiMicOff, FiVideo, FiVideoOff, FiPhoneOff, FiCopy, FiCheck, FiRotateCw, FiShare2 } from 'react-icons/fi';
 import { getIceServers } from './turnConfig';
 
 const SOCKET_URL = import.meta.env.VITE_BACKEND_URL || 
@@ -34,6 +34,38 @@ function VideoCall({ sessionCode, onEndCall }) {
 
   // Optimized ICE servers with multiple STUN and TURN servers for better connectivity
   const iceServers = getIceServers(true);
+
+  // Generate shareable URL
+  const shareableUrl = `${window.location.origin}/${sessionCode}`;
+
+  // Copy link function
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareableUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  };
+
+  // Share function
+  const shareLink = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join my video call',
+          text: 'Click the link to join my video call',
+          url: shareableUrl,
+        });
+      } catch (err) {
+        console.error('Failed to share:', err);
+      }
+    } else {
+      // Fallback to copy
+      copyLink();
+    }
+  };
 
   // Connect to backend and handle room join
   useEffect(() => {
@@ -527,7 +559,7 @@ function VideoCall({ sessionCode, onEndCall }) {
       {/* Session code with copy icon */}
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-7xl mx-auto py-8">
         <div className="mb-8 text-center flex flex-col items-center">
-          <span className="text-base opacity-70 flex items-center gap-2">
+          <span className="text-base opacity-70 flex items-center gap-2 mb-4">
             Session Code:
             <span className="font-mono font-bold text-lg opacity-100 bg-black px-3 py-1 rounded-lg tracking-widest border border-white/10 flex items-center gap-2">
               {sessionCode}
@@ -545,6 +577,26 @@ function VideoCall({ sessionCode, onEndCall }) {
               </button>
             </span>
           </span>
+          
+          {/* Share buttons */}
+          <div className="flex items-center gap-3">
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200"
+              onClick={copyLink}
+              title="Copy link"
+            >
+              <FiCopy size={16} />
+              <span className="text-sm">Copy Link</span>
+            </button>
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200"
+              onClick={shareLink}
+              title="Share link"
+            >
+              <FiShare2 size={16} />
+              <span className="text-sm">Share</span>
+            </button>
+          </div>
         </div>
         
         {/* Videos side-by-side (desktop) or stacked (mobile), maximized */}
