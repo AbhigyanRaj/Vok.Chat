@@ -774,147 +774,328 @@ function App() {
         </div>
       </div>
 
-      {/* Main Video Area */}
-      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-7xl mx-auto p-4 lg:p-6">
-        {/* Primary Video (Remote) */}
-        <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 h-full">
-          {/* Remote Video - Large */}
-          <div className="flex-1 relative rounded-2xl shadow-2xl border border-white/10 bg-[#181818] overflow-hidden min-h-[300px] lg:min-h-[500px]">
-            {(!peerVideoPaused) ? (
-              <video
-                ref={remoteVideoRef}
-                autoPlay
-                playsInline
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                <FiVideoOff size={64} className="mb-4 opacity-50" />
-                <span className="text-lg font-medium">Video Paused</span>
-              </div>
-            )}
-            
-            {/* Peer Status Overlays */}
-            {peerMuted && (
-              <div className="absolute top-4 left-4 bg-black/70 rounded-full p-2">
-                <FiMicOff size={20} className="text-red-400" />
-              </div>
-            )}
-            {peerVideoPaused && (
-              <div className="absolute top-4 right-4 bg-black/70 rounded-full p-2">
-                <FiVideoOff size={20} className="text-yellow-400" />
-              </div>
-            )}
-            
-            {/* Peer Name */}
-            <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-lg">
-              <span className="text-sm font-medium">Peer</span>
-            </div>
-          </div>
-
-          {/* Local Video - Small */}
-          <div className="w-full lg:w-80 h-48 lg:h-auto lg:flex-shrink-0">
-            <div className="relative rounded-xl shadow-xl border border-white/10 bg-[#181818] overflow-hidden w-full h-full">
-              {(!videoPaused) ? (
+      {/* Main Video Area - Responsive Layout */}
+      <div className="flex-1 w-full relative">
+        {/* Mobile Layout (Portrait) */}
+        <div className="block sm:hidden w-full h-full">
+          <div className="w-full h-full flex flex-col">
+            {/* Remote Video - Full Width */}
+            <div className="flex-1 relative bg-black rounded-none">
+              {(!peerVideoPaused) ? (
                 <video
-                  ref={localVideoRef}
+                  ref={remoteVideoRef}
                   autoPlay
-                  muted
                   playsInline
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                  <FiVideoOff size={32} className="mb-2 opacity-50" />
-                  <span className="text-sm font-medium">Video Paused</span>
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-[#181818]">
+                  <FiVideoOff size={48} className="mb-3 opacity-50" />
+                  <span className="text-base font-medium">Video Paused</span>
                 </div>
               )}
               
-              {/* Local Status Overlays */}
-              {isMuted && (
-                <div className="absolute top-2 left-2 bg-black/70 rounded-full p-1.5">
-                  <FiMicOff size={16} className="text-red-400" />
+              {/* Peer Status Overlays */}
+              {peerMuted && (
+                <div className="absolute top-4 left-4 bg-black/70 rounded-full p-2">
+                  <FiMicOff size={18} className="text-red-400" />
                 </div>
               )}
-              {videoPaused && (
-                <div className="absolute top-2 right-2 bg-black/70 rounded-full p-1.5">
-                  <FiVideoOff size={16} className="text-yellow-400" />
+              {peerVideoPaused && (
+                <div className="absolute top-4 right-4 bg-black/70 rounded-full p-2">
+                  <FiVideoOff size={18} className="text-yellow-400" />
                 </div>
               )}
               
-              {/* Local Name */}
-              <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm px-2 py-1 rounded text-xs">
-                <span className="font-medium">You</span>
+              {/* Local Video - Floating PIP */}
+              <div className="absolute top-4 right-4 w-24 h-32 rounded-lg overflow-hidden border-2 border-white/20 shadow-lg">
+                <div className="w-full h-full relative">
+                  {(!videoPaused) ? (
+                    <video
+                      ref={localVideoRef}
+                      autoPlay
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#181818] flex items-center justify-center">
+                      <FiVideoOff size={16} className="text-gray-400" />
+                    </div>
+                  )}
+                  
+                  {/* Local Status Overlays */}
+                  {isMuted && (
+                    <div className="absolute top-1 left-1 bg-black/70 rounded-full p-1">
+                      <FiMicOff size={12} className="text-red-400" />
+                    </div>
+                  )}
+                  {videoPaused && (
+                    <div className="absolute top-1 right-1 bg-black/70 rounded-full p-1">
+                      <FiVideoOff size={12} className="text-yellow-400" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tablet Layout (Landscape) */}
+        <div className="hidden sm:block lg:hidden w-full h-full">
+          <div className="w-full h-full flex">
+            {/* Remote Video - Main */}
+            <div className="flex-1 relative bg-black">
+              {(!peerVideoPaused) ? (
+                <video
+                  ref={remoteVideoRef}
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-[#181818]">
+                  <FiVideoOff size={64} className="mb-4 opacity-50" />
+                  <span className="text-lg font-medium">Video Paused</span>
+                </div>
+              )}
+              
+              {/* Peer Status Overlays */}
+              {peerMuted && (
+                <div className="absolute top-4 left-4 bg-black/70 rounded-full p-2">
+                  <FiMicOff size={20} className="text-red-400" />
+                </div>
+              )}
+              {peerVideoPaused && (
+                <div className="absolute top-4 right-4 bg-black/70 rounded-full p-2">
+                  <FiVideoOff size={20} className="text-yellow-400" />
+                </div>
+              )}
+            </div>
+
+            {/* Local Video - Side Panel */}
+            <div className="w-48 h-full bg-black">
+              <div className="w-full h-full relative">
+                {(!videoPaused) ? (
+                  <video
+                    ref={localVideoRef}
+                    autoPlay
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-[#181818] flex items-center justify-center">
+                    <FiVideoOff size={32} className="text-gray-400" />
+                  </div>
+                )}
+                
+                {/* Local Status Overlays */}
+                {isMuted && (
+                  <div className="absolute top-2 left-2 bg-black/70 rounded-full p-1.5">
+                    <FiMicOff size={16} className="text-red-400" />
+                  </div>
+                )}
+                {videoPaused && (
+                  <div className="absolute top-2 right-2 bg-black/70 rounded-full p-1.5">
+                    <FiVideoOff size={16} className="text-yellow-400" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden lg:block w-full h-full">
+          <div className="w-full h-full flex">
+            {/* Remote Video - Main */}
+            <div className="flex-1 relative bg-black">
+              {(!peerVideoPaused) ? (
+                <video
+                  ref={remoteVideoRef}
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-[#181818]">
+                  <FiVideoOff size={80} className="mb-6 opacity-50" />
+                  <span className="text-xl font-medium">Video Paused</span>
+                </div>
+              )}
+              
+              {/* Peer Status Overlays */}
+              {peerMuted && (
+                <div className="absolute top-6 left-6 bg-black/70 rounded-full p-3">
+                  <FiMicOff size={24} className="text-red-400" />
+                </div>
+              )}
+              {peerVideoPaused && (
+                <div className="absolute top-6 right-6 bg-black/70 rounded-full p-3">
+                  <FiVideoOff size={24} className="text-yellow-400" />
+                </div>
+              )}
+            </div>
+
+            {/* Local Video - Side Panel */}
+            <div className="w-80 h-full bg-black">
+              <div className="w-full h-full relative">
+                {(!videoPaused) ? (
+                  <video
+                    ref={localVideoRef}
+                    autoPlay
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-[#181818] flex items-center justify-center">
+                    <FiVideoOff size={48} className="text-gray-400" />
+                  </div>
+                )}
+                
+                {/* Local Status Overlays */}
+                {isMuted && (
+                  <div className="absolute top-4 left-4 bg-black/70 rounded-full p-2">
+                    <FiMicOff size={20} className="text-red-400" />
+                  </div>
+                )}
+                {videoPaused && (
+                  <div className="absolute top-4 right-4 bg-black/70 rounded-full p-2">
+                    <FiVideoOff size={20} className="text-yellow-400" />
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Control Bar */}
-      <div className="w-full bg-black/50 backdrop-blur-sm border-t border-white/10 px-4 py-4 lg:py-6">
-        <div className="max-w-4xl mx-auto flex flex-wrap justify-center items-center gap-3 lg:gap-4">
-          {/* Mute Button */}
-          <button
-            className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
-            onClick={() => setIsMuted(m => !m)}
-            title={isMuted ? 'Unmute microphone' : 'Mute microphone'}
-          >
-            {isMuted ? <FiMicOff size={24} className="lg:w-8 lg:h-8" /> : <FiMic size={24} className="lg:w-8 lg:h-8" />}
-          </button>
+      {/* Control Bar - Responsive */}
+      <div className="w-full bg-black/90 backdrop-blur-sm border-t border-white/10">
+        {/* Mobile Controls */}
+        <div className="block sm:hidden px-4 py-3">
+          <div className="flex justify-center items-center gap-2">
+            <button
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+              onClick={() => setIsMuted(m => !m)}
+              title={isMuted ? 'Unmute microphone' : 'Mute microphone'}
+            >
+              {isMuted ? <FiMicOff size={20} /> : <FiMic size={20} />}
+            </button>
 
-          {/* Video Toggle */}
-          <button
-            className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
-            onClick={() => setVideoPaused((v) => !v)}
-            title={videoPaused ? 'Resume video' : 'Pause video'}
-          >
-            {videoPaused ? <FiVideoOff size={24} className="lg:w-8 lg:h-8" /> : <FiVideo size={24} className="lg:w-8 lg:h-8" />}
-          </button>
+            <button
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+              onClick={() => setVideoPaused((v) => !v)}
+              title={videoPaused ? 'Resume video' : 'Pause video'}
+            >
+              {videoPaused ? <FiVideoOff size={20} /> : <FiVideo size={20} />}
+            </button>
 
-          {/* Camera Rotate */}
-          <button
-            className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
-            onClick={rotateCamera}
-            title="Rotate camera"
-          >
-            <FiRotateCw size={24} className="lg:w-8 lg:h-8" />
-          </button>
+            <button
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+              onClick={rotateCamera}
+              title="Rotate camera"
+            >
+              <FiRotateCw size={20} />
+            </button>
 
-          {/* Quality Toggle */}
-          <button
-            className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
-            onClick={() => {
-              const qualities = ['low', 'medium', 'high'];
-              const currentIndex = qualities.indexOf(videoQuality);
-              const nextQuality = qualities[(currentIndex + 1) % qualities.length];
-              setVideoQuality(nextQuality);
-              applyVideoQualitySettings(nextQuality);
-              setQualityNotificationMessage(`Manually switched to ${nextQuality} quality.`);
-              setShowQualityNotification(true);
-              if (qualityNotificationTimeoutRef.current) {
-                clearTimeout(qualityNotificationTimeoutRef.current);
-              }
-              qualityNotificationTimeoutRef.current = setTimeout(() => {
-                setShowQualityNotification(false);
-              }, 2000);
-            }}
-            title={`Current: ${videoQuality} quality. Click to cycle.`}
-          >
-            <div className="text-center">
-              <div className="text-xs font-bold">{videoQuality.toUpperCase()}</div>
-              <div className="text-xs opacity-70">QUALITY</div>
-            </div>
-          </button>
+            <button
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+              onClick={() => {
+                const qualities = ['low', 'medium', 'high'];
+                const currentIndex = qualities.indexOf(videoQuality);
+                const nextQuality = qualities[(currentIndex + 1) % qualities.length];
+                setVideoQuality(nextQuality);
+                applyVideoQualitySettings(nextQuality);
+                setQualityNotificationMessage(`Manually switched to ${nextQuality} quality.`);
+                setShowQualityNotification(true);
+                if (qualityNotificationTimeoutRef.current) {
+                  clearTimeout(qualityNotificationTimeoutRef.current);
+                }
+                qualityNotificationTimeoutRef.current = setTimeout(() => {
+                  setShowQualityNotification(false);
+                }, 2000);
+              }}
+              title={`Current: ${videoQuality} quality. Click to cycle.`}
+            >
+              <div className="text-center">
+                <div className="text-xs font-bold">{videoQuality.toUpperCase()}</div>
+                <div className="text-xs opacity-70">QUALITY</div>
+              </div>
+            </button>
 
-          {/* End Call */}
-          <button
-            className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition-all duration-200"
-            onClick={handleEndCall}
-            title="End call"
-          >
-            <FiPhoneOff size={24} className="lg:w-8 lg:h-8" />
-          </button>
+            <button
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition-all duration-200"
+              onClick={handleEndCall}
+              title="End call"
+            >
+              <FiPhoneOff size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Tablet/Desktop Controls */}
+        <div className="hidden sm:block px-6 py-4 lg:py-6">
+          <div className="max-w-4xl mx-auto flex justify-center items-center gap-4 lg:gap-6">
+            <button
+              className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+              onClick={() => setIsMuted(m => !m)}
+              title={isMuted ? 'Unmute microphone' : 'Mute microphone'}
+            >
+              {isMuted ? <FiMicOff size={24} className="lg:w-8 lg:h-8" /> : <FiMic size={24} className="lg:w-8 lg:h-8" />}
+            </button>
+
+            <button
+              className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+              onClick={() => setVideoPaused((v) => !v)}
+              title={videoPaused ? 'Resume video' : 'Pause video'}
+            >
+              {videoPaused ? <FiVideoOff size={24} className="lg:w-8 lg:h-8" /> : <FiVideo size={24} className="lg:w-8 lg:h-8" />}
+            </button>
+
+            <button
+              className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+              onClick={rotateCamera}
+              title="Rotate camera"
+            >
+              <FiRotateCw size={24} className="lg:w-8 lg:h-8" />
+            </button>
+
+            <button
+              className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+              onClick={() => {
+                const qualities = ['low', 'medium', 'high'];
+                const currentIndex = qualities.indexOf(videoQuality);
+                const nextQuality = qualities[(currentIndex + 1) % qualities.length];
+                setVideoQuality(nextQuality);
+                applyVideoQualitySettings(nextQuality);
+                setQualityNotificationMessage(`Manually switched to ${nextQuality} quality.`);
+                setShowQualityNotification(true);
+                if (qualityNotificationTimeoutRef.current) {
+                  clearTimeout(qualityNotificationTimeoutRef.current);
+                }
+                qualityNotificationTimeoutRef.current = setTimeout(() => {
+                  setShowQualityNotification(false);
+                }, 2000);
+              }}
+              title={`Current: ${videoQuality} quality. Click to cycle.`}
+            >
+              <div className="text-center">
+                <div className="text-xs font-bold">{videoQuality.toUpperCase()}</div>
+                <div className="text-xs opacity-70">QUALITY</div>
+              </div>
+            </button>
+
+            <button
+              className="flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition-all duration-200"
+              onClick={handleEndCall}
+              title="End call"
+            >
+              <FiPhoneOff size={24} className="lg:w-8 lg:h-8" />
+            </button>
+          </div>
         </div>
       </div>
 
