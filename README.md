@@ -31,6 +31,18 @@ To provide a safe, supportive, and empowering space for meaningful conversations
 
 ---
 
+## 🖼️ Demo
+
+<div align="center">
+
+![VokChat Demo](public/demo.png)
+
+*Working application demo showing the video calling interface*
+
+</div>
+
+---
+
 ## 🏗️ Technical Architecture
 
 ### System Overview
@@ -128,11 +140,10 @@ sequenceDiagram
 - ✅ **Real-time Controls** - Mute, pause video, end call
 - ✅ **Responsive Design** - Works on desktop and mobile
 
-### User Experience
-- 🎨 **Modern UI** - Clean, minimalist design
-- 📱 **Mobile Optimized** - Touch-friendly controls
-- ⚡ **Instant Connection** - Quick session setup
-- 🔄 **Auto-reconnection** - Handles network issues gracefully
+### Mobile Features
+- 📱 **Camera Rotation** - Switch between front/back cameras
+- 👋 **User Leave Notifications** - Real-time notifications when peers leave
+- 🎯 **Touch-Optimized** - Designed for mobile interaction
 
 ### Technical Features
 - 🌐 **WebRTC** - Standard web technology
@@ -207,6 +218,7 @@ Navigate to `http://localhost:5173`
 ### During the Call
 - 🎤 **Mute/Unmute** - Click microphone icon
 - 📹 **Pause/Resume Video** - Click video icon  
+- 🔄 **Rotate Camera** - Click rotate icon (mobile devices)
 - 📞 **End Call** - Click red phone icon
 - 📋 **Copy Session Code** - Click copy icon next to code
 
@@ -224,6 +236,8 @@ VokChat/
 │   ├── index.js              # Express + Socket.IO server
 │   └── package.json          # Backend dependencies
 ├── 📁 public/                # Static assets
+│   ├── demo.png              # Application demo
+│   ├── logs.png              # Backend server logs
 │   └── 📁 fonts/            # Custom typography
 ├── package.json              # Frontend dependencies
 ├── tailwind.config.js        # Tailwind configuration
@@ -313,22 +327,15 @@ NODE_ENV=production
 
 ---
 
-## 🤝 Contributing
+## 📊 Backend Logs
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+<div align="center">
 
-### Development Setup
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+![Backend Server Logs](public/logs.png)
 
----
+*Real-time backend server logs showing successful WebSocket connections and room management*
 
-## 📄 License
-
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
+</div>
 
 ---
 
