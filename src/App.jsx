@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { FiMic, FiMicOff, FiVideo, FiVideoOff, FiPhoneOff, FiCopy, FiCheck } from 'react-icons/fi';
 
-const SOCKET_URL = 'ws://localhost:5001';
+const SOCKET_URL = import.meta.env.VITE_BACKEND_URL || 
+  (import.meta.env.PROD ? 'https://vok-chat.onrender.com' : 'ws://localhost:5001');
 
 function generateSessionCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -41,6 +42,7 @@ function App() {
   useEffect(() => {
     if (joined && sessionCode) {
       setSessionError('');
+      console.log('Connecting to backend at:', SOCKET_URL);
       socketRef.current = io(SOCKET_URL, { transports: ['websocket'] });
       socketRef.current.on('connect', () => {
         console.log('Socket connected:', socketRef.current.id);
