@@ -4,12 +4,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "dev": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["video-calling", "webrtc", "socket.io", "express"],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "VokChat backend server for WebRTC signaling",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
